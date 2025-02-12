@@ -72,47 +72,44 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .with_children(|parent| {
             parent
                 .spawn(Node {
-                    width: Val::Percent(100.),
-                    height: Val::Percent(100.),
+                    width: Val::Percent(80.),
+                    height: Val::Percent(88.),
+                    top: Val::Percent(5.),
+                    left: Val::Percent(10.),
                     flex_direction: FlexDirection::Row,
                     justify_content: JustifyContent::SpaceBetween,
                     ..default()
                 })
                 .with_children(|parent| {
                     // Scrollable content container
-                    parent
+                     parent
                         .spawn((
                             Node {
                                 flex_direction: FlexDirection::Column,
-                                justify_content: JustifyContent::Start,
-                                align_items: AlignItems::Start,
-                                position_type: PositionType::Absolute,
-                                width: Val::Percent(75.0),
-                                height: Val::Percent(100.0),
-                                left: Val::Percent(12.5),
-                                top: Val::Px(5.0),
-                                overflow: Overflow::clip_y(),
+                                align_self: AlignSelf::Stretch,
+                                height: Val::Percent(100.),
+                                overflow: Overflow::scroll_y(), // n.b.
                                 ..default()
                             },
-                            ScrollableContent {
-                                max_scroll: content.lines().count() as f32 * LINE_HEIGHT,
-                                current_scroll: 0.0,
-                            },
+                            //BackgroundColor(Color::srgb(0.10, 0.10, 0.10)),
                         ))
                         .with_children(|parent| {
                             for (chunk_idx, line_idx) in &line_indices {
-                                if let Some(text) = screenplay.get_line(*chunk_idx, *line_idx) {
-                                    let display_text = if text.is_empty() { " " } else { text };
+                                    if let Some(text) = screenplay.get_line(*chunk_idx, *line_idx) {
+                                        let display_text = if text.is_empty() { " " } else { text };
                                     parent.spawn((
                                         Text::new(display_text.to_string()),
                                         TextFont {
                                             font: screenplay_font.clone(),
-                                            font_size: FONT_SIZE,
                                             ..default()
                                         },
                                         Label,
                                         AccessibilityNode(Accessible::new(Role::ListItem)),
-                                    ));
+                                    ))
+                                    .insert(PickingBehavior {
+                                        should_block_lower: false,
+                                        ..default()
+                                    });
                                 }
                             }
                         });

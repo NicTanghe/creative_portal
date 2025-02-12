@@ -7,7 +7,6 @@ use bevy::{
 
 use crate::prelude::{
     components::texts::*,
-
 };
 
 
@@ -98,4 +97,6 @@ pub fn debug_input_log(
         warn!("DebugText entity not found! Make sure it was spawned.");
     }
 }
+
+
 
