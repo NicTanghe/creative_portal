@@ -14,6 +14,10 @@ pub struct DebugText;
 pub struct ScrollableText; // Marker for the scrolling text container
 
 
+#[derive(Component)]
+pub struct AmISelectedLine{
+    selected: bool,
+}
 
 #[derive(Component)]
 pub struct ScrollableContent {

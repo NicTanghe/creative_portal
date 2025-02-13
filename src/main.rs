@@ -4,6 +4,7 @@
 
 use accesskit::{Node as Accessible, Role};
 use bevy::{
+    window::WindowResolution,
     color::palettes::css::{GOLD,GRAY,WHITE,DARK_GREY},
     a11y::AccessibilityNode,
     input::mouse::{MouseScrollUnit, MouseWheel},
@@ -11,6 +12,7 @@ use bevy::{
     prelude::*,
     winit::WinitSettings,
     diagnostic::FrameTimeDiagnosticsPlugin,
+    
 };
 
 
@@ -24,6 +26,7 @@ use creative_hub::prelude::{
     systems::{
         text::*,
         editor::*,
+        settings::*,
     },
 };
 
@@ -35,21 +38,35 @@ use creative_hub::prelude::{
 fn main() {
     let mut app = App::new();
     app
-        .insert_resource(
-            ChunkersR {
-                screenplay: Chunks::new("assets/screenplays/smalltest.fountain") })
-        .add_plugins((
-            DefaultPlugins,
-            FrameTimeDiagnosticsPlugin
-            )).insert_resource(WinitSettings::desktop_app())
-            .add_systems(Startup, setup)
-            .add_systems(Update, (
-                    update_scroll_position,
-                    text_update_system,
-                    update_scrollbar_position,
-                    cursor_movement_system,
-                    //scrollbar_drag_system
-                    ));
+    .insert_resource(
+        ChunkersR {
+            screenplay: Chunks::new("assets/screenplays/smalltest.fountain") })
+    .add_plugins((
+        DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                resolution: 
+                    WindowResolution::new(500., 300.)
+                        .with_scale_factor_override(1.0),
+                ..Default::default()
+            }),
+            ..Default::default()
+        }),
+        FrameTimeDiagnosticsPlugin,
+        ))
+    .insert_resource(WinitSettings::desktop_app())
+    .add_systems(Startup, setup)
+    .add_systems(Update, (
+            //text
+            update_scroll_position,
+            text_update_system,
+            update_scrollbar_position,
+            cursor_movement_system,
+            //scrollbar_drag_system
+            
+
+            //settings
+            //change_scale_factor,
+            ));
 
     app.run();
 }
@@ -110,8 +127,11 @@ fn setup(
                         .spawn((
                             Name::new("fountain_editor"),
                             ScrollableContainer {
-                                //line height seems to be uncorrect for some reason
-                                content_height:line_indices.len() as f32 * LINE_HEIGHT/2.,
+                                //line height seems to be uncorrect for some reason scale factor
+                                //really fucks with it 2 also how does the scrolfield get larger
+                                //when its smaller/
+                                //why divided by 10 td ? pretty sure a line is not 1 px in size
+                                content_height:line_indices.len() as f32 * LINE_HEIGHT/10.,
                             },
                             Node {
                                 flex_direction: FlexDirection::Column,

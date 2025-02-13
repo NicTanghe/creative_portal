@@ -8,6 +8,68 @@ use crate::prelude::{
     }
 };
 
+
+
+//ok best change how this works.
+//
+//we should get the cursor y by polling the selected line
+//we should have a current line variable thats what they used in iced REMEMBER1 also thx 
+//this should also make it way easyer to get a location when everything is formatted.
+//
+//
+
+
+// make this just change what line has AmISelectedLine this might be slower but at this point f it
+// then make it poll Am i selected to get the position
+// Im not sure this is posssible as it starts with a querry.
+// it might need 2 systems that chain with one proccing the other one.
+pub fn cursor_movement_system_v2(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut chunkers: ResMut<ChunkersR>,
+    mut queries: ParamSet<(
+        Query<&mut Node, With<CursorIndicator>>, // Mutable access for updating cursor position
+    )>,
+) {
+    let screenplay = &mut chunkers.screenplay; // Access screenplay from ChunkersR
+    let mut moved = false; // Track if movement happened
+
+
+    //just_pressed is once and pressed is contineusely
+    if keyboard_input.pressed(KeyCode::ArrowUp) {
+        screenplay.move_up();
+        moved = true;
+    } 
+    if keyboard_input.pressed(KeyCode::ArrowDown) {
+        screenplay.move_down();
+        moved = true;
+    }
+    if keyboard_input.pressed(KeyCode::ArrowLeft) {
+        screenplay.move_left();
+        moved = true;
+    }
+    if keyboard_input.pressed(KeyCode::ArrowRight) {
+        screenplay.move_right();
+        moved = true;
+    }
+
+    // If cursor moved, update the UI position
+    // this is ok for now but sadly not handelling line breaking
+    if moved {
+        
+        let cursor_x = screenplay.get_cursor_x(7.0); // Adjust based on font size
+        let cursor_y = screenplay.get_cursor_y(14.0); // Adjust based on line height
+
+        // Drop the first borrow before modifying the cursor position
+        let mut cursor_query = queries.p0();
+        for mut cursor_node in cursor_query.iter_mut() {
+            cursor_node.left = Val::Px(cursor_x);
+            cursor_node.top = Val::Px(cursor_y);
+        }
+
+        println!("Cursor moved to: X = {:.2}, Y = {:.2}", cursor_x, cursor_y);
+    }    
+}
+
 pub fn cursor_movement_system_debug(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut chunkers: ResMut<ChunkersR>,
@@ -53,19 +115,21 @@ pub fn cursor_movement_system(
     let screenplay = &mut chunkers.screenplay; // Access screenplay from ChunkersR
     let mut moved = false; // Track if movement happened
 
-    if keyboard_input.just_pressed(KeyCode::ArrowUp) {
+
+    //just_pressed is once and pressed is contineusely
+    if keyboard_input.pressed(KeyCode::ArrowUp) {
         screenplay.move_up();
         moved = true;
     } 
-    if keyboard_input.just_pressed(KeyCode::ArrowDown) {
+    if keyboard_input.pressed(KeyCode::ArrowDown) {
         screenplay.move_down();
         moved = true;
     }
-    if keyboard_input.just_pressed(KeyCode::ArrowLeft) {
+    if keyboard_input.pressed(KeyCode::ArrowLeft) {
         screenplay.move_left();
         moved = true;
     }
-    if keyboard_input.just_pressed(KeyCode::ArrowRight) {
+    if keyboard_input.pressed(KeyCode::ArrowRight) {
         screenplay.move_right();
         moved = true;
     }
@@ -85,6 +149,6 @@ pub fn cursor_movement_system(
         }
 
         println!("Cursor moved to: X = {:.2}, Y = {:.2}", cursor_x, cursor_y);
-    }
+    }    
 }
 

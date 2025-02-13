@@ -21,7 +21,7 @@ pub fn text_color_system(time: Res<Time>, mut query: Query<&mut TextColor, With<
     }
 }
 //const FONT_SIZE: f32 = 20.;
-const LINE_HEIGHT: f32 = 13.;
+const LINE_HEIGHT: f32 = 14.5;
 
 pub fn text_update_system(
     diagnostics: Res<DiagnosticsStore>,
@@ -89,6 +89,8 @@ pub fn update_scrollbar_position(
     // Extract the scroll data first and store it in a variable
     let scroll_data = queries.p0().iter().next().map(|(scrollable, scroll_position, _)| {
         let max_scroll_height = scrollable.content_height;
+
+        //either scroll position offset is behaving strangly with height or something else is fucked
         let scroll_percent = (scroll_position.offset_y / max_scroll_height).clamp(0.0, 1.0) * 100.0;
         scroll_percent
     });
@@ -96,7 +98,7 @@ pub fn update_scrollbar_position(
     // Drop the first borrow before accessing `p1()`
     if let Some(scroll_percent) = scroll_data {
         for mut scrollbar_node in queries.p1().iter_mut() {
-            //println!("Updating scrollbar: mapped to {:.2}%", scroll_percent);
+            println!("Updating scrollbar: mapped to {:.2}%", scroll_percent);
 
             scrollbar_node.top = Val::Percent(scroll_percent);
 
