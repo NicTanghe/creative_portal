@@ -1,12 +1,15 @@
+use bevy::{
+    prelude::Component,
+    ecs::system::Resource,
+};
 
-use bevy_ecs::{component::Component};
 use std::fs;
 
 #[derive(Component)]
 pub struct TextChunk {
     pub lines: Vec<String>, 
 }
-
+#[derive(Resource)]
 pub struct Chunks {
     pub chunks: Vec<TextChunk>,
     pub cursor: (usize, usize, usize), // (chunk_index, line_index, horizontal_position)
@@ -37,6 +40,7 @@ impl Chunks {
             .join("\n")
     }
 
+
     /// Returns a vector of (chunk_index, line_index) pairs
     pub fn line_indices(&self) -> Vec<(usize, usize)> {
         self.chunks
@@ -54,6 +58,25 @@ impl Chunks {
     }
 
 
+    /// Computes the absolute X position of the cursor in pixels
+    pub fn get_cursor_x(&self, char_width: f32) -> f32 {
+        let (_, _, hor) = self.cursor;
+        hor as f32 * char_width
+    }
+
+    /// Computes the absolute Y position of the cursor in pixels
+    pub fn get_cursor_y(&self, line_height: f32) -> f32 {
+        let (chunk, line, _) = self.cursor;
+
+        // Sum up all lines from previous chunks
+        let mut linepos = 0;
+        for i in 0..chunk {
+            linepos += self.chunks[i].lines.len();
+        }
+        linepos += line; // Add the current line position within the chunk
+
+        linepos as f32 * line_height
+    }
     //sets cursor position
     pub fn set_cursor(&mut self, chunk: usize, line: usize, hor_pos: usize) {
         if chunk < self.chunks.len() {

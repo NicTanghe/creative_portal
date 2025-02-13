@@ -21,9 +21,6 @@ pub struct ScrollableContent {
    pub current_scroll: f32, // Current scroll offset
 }
 
-#[derive(Component)]
-pub struct ScrollbarDragging(bool);
-
 /// Scrollbar Handle Marker
 #[derive(Component)]
 pub struct ScrollbarHandle;
@@ -34,3 +31,17 @@ pub struct ScrollableContainer {  // Range: 0.0 (top) to 1.0 (bottom)
   pub  content_height: f32,
 }
 
+
+#[derive(Component, Default)]
+struct ScrollPosition {
+    offset_y: f32,
+}
+
+//#[derive(Resource, Default)]
+//struct DraggingHandle {
+//    active: bool,
+//    last_cursor_y: f32,
+//}
+
+#[derive(Component, Default)]
+pub struct CursorIndicator; 
