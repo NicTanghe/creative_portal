@@ -14,11 +14,6 @@ pub struct DebugText;
 pub struct ScrollableText; // Marker for the scrolling text container
 
 
-/// Scrollbar Handle Marker
-#[derive(Component)]
-pub struct ScrollbarHandle;
-
-
 
 #[derive(Component)]
 pub struct ScrollableContent {
@@ -28,3 +23,14 @@ pub struct ScrollableContent {
 
 #[derive(Component)]
 pub struct ScrollbarDragging(bool);
+
+/// Scrollbar Handle Marker
+#[derive(Component)]
+pub struct ScrollbarHandle;
+
+
+#[derive(Component)]
+pub struct ScrollableContainer {  // Range: 0.0 (top) to 1.0 (bottom)
+  pub  content_height: f32,
+}
+

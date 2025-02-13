@@ -35,6 +35,7 @@ use creative_hub::prelude::{
         .add_systems(Update, (
                 update_scroll_position,
                 text_update_system,
+                update_scrollbar_position,
                 //scrollbar_drag_system
                 ));
 
@@ -43,7 +44,7 @@ use creative_hub::prelude::{
 
 const FONT_SIZE: f32 = 12.;
 const LINE_HEIGHT: f32 = 21.;
-const SCROLLBAR_WIDTH: f32 = 10.0;
+const SCROLLBAR_WIDTH: f32 = 5.0;
 const SCROLL_HANDLE_HEIGHT: f32 = 30.0;
 
 /// **Setup function to create UI layout**
@@ -71,7 +72,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         })
         .with_children(|parent| {
             parent
-                .spawn(Node {
+                .spawn(
+                    Node {
                     width: Val::Percent(80.),
                     height: Val::Percent(88.),
                     top: Val::Percent(5.),
@@ -82,8 +84,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 })
                 .with_children(|parent| {
                     // Scrollable content container
-                     parent
+                    parent
                         .spawn((
+                            Name::new("fountain_editor"),
+                            ScrollableContainer {
+                                content_height:line_indices.len() as f32 * LINE_HEIGHT,
+                            },
                             Node {
                                 flex_direction: FlexDirection::Column,
                                 align_self: AlignSelf::Stretch,
@@ -101,6 +107,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                         Text::new(display_text.to_string()),
                                         TextFont {
                                             font: screenplay_font.clone(),
+                                            font_size: 12.0,
                                             ..default()
                                         },
                                         Label,
@@ -120,10 +127,11 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                             Node {
                                 width: Val::Px(SCROLLBAR_WIDTH),
                                 height: Val::Percent(100.0),
+                                left: Val::Px(20.0),
                                 justify_content: JustifyContent::Start,
                                 ..default()
                             },
-                            BackgroundColor(DARK_GREY.into()),
+                            //BackgroundColor(DARK_GREY.into()),
                         ))
                         .with_children(|parent| {
                             // Scrollbar Handle (Draggable)
@@ -131,7 +139,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                                 Node {
                                     width: Val::Px(SCROLLBAR_WIDTH),
                                     height: Val::Px(SCROLL_HANDLE_HEIGHT),
-                                    top: Val::Px(0.0), // Start at the top
+                                    top: Val::Percent(0.), // Start at the top
                                     ..default()
                                 },
                                 BackgroundColor(WHITE.into()),
