@@ -102,25 +102,24 @@ pub fn cursor_movement_system_debug(
         println!("Cursor moved to: X = {:.2}, Y = {:.2}", cursor_x, cursor_y);
     }
 }
-
-
-
-pub fn cursor_movement_system(
+pub fn cursor_movement_system_v3(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut chunkers: ResMut<ChunkersR>,
-    mut queries: ParamSet<(
+    mut q_cursor: ParamSet<(
         Query<&mut Node, With<CursorIndicator>>, // Mutable access for updating cursor position
+    )>,
+    mut q_linecoord: ParamSet<(
+        Query<(&mut Node, &GlobalTransform, &LinePosition), Without<CursorIndicator>>, // Ensure no conflict with cursor
     )>,
 ) {
     let screenplay = &mut chunkers.screenplay; // Access screenplay from ChunkersR
     let mut moved = false; // Track if movement happened
 
-
-    //just_pressed is once and pressed is contineusely
+    // Handle key press logic
     if keyboard_input.pressed(KeyCode::ArrowUp) {
         screenplay.move_up();
         moved = true;
-    } 
+    }
     if keyboard_input.pressed(KeyCode::ArrowDown) {
         screenplay.move_down();
         moved = true;
@@ -135,20 +134,44 @@ pub fn cursor_movement_system(
     }
 
     // If cursor moved, update the UI position
-    // this is ok for now but sadly not handelling line breaking
     if moved {
-        
         let cursor_x = screenplay.get_cursor_x(7.0); // Adjust based on font size
         let cursor_y = screenplay.get_cursor_y(14.0); // Adjust based on line height
 
-        // Drop the first borrow before modifying the cursor position
-        let mut cursor_query = queries.p0();
-        for mut cursor_node in cursor_query.iter_mut() {
-            cursor_node.left = Val::Px(cursor_x);
-            cursor_node.top = Val::Px(cursor_y);
+        let (chunkpos, linepos) = chunkers.screenplay.get_cursor_line_index();
+        
+        // Iterate over the line position query (excluding the cursor)
+        for (_node, transform, line_position) in q_linecoord.p0().iter_mut() {
+            // Compare chunkpos and linepos with LinePosition's chunk_idx and line_idx
+            if chunkpos == line_position.chunk_idx && linepos == line_position.line_idx {
+                // Store the transform for the matched line
+                println!("UI Position of Line {:?}: {:?}", (chunkpos, linepos), transform.translation());
+                println!("Cursor moved to: X = {:.2}, Y = {:.2}", cursor_x, transform.translation());
+
+                // Now modify the cursor position
+                let mut cursor_query = q_cursor.p0();
+                for mut cursor_node in cursor_query.iter_mut() {
+                    cursor_node.left = Val::Px(120.);
+                    cursor_node.top = Val::Px(transform.translation().y+5.);
+                }
+            }
         }
 
-        println!("Cursor moved to: X = {:.2}, Y = {:.2}", cursor_x, cursor_y);
-    }    
+            }
+}
+pub fn update_selected_line(
+    mut query: Query<(&mut Node, &GlobalTransform, &LinePosition)>,
+    chunkers: Res<ChunkersR>,
+) {
+    let (chunkpos, linepos) = chunkers.screenplay.get_cursor_line_index(); // Assuming this returns a (usize, usize, usize)
+
+    // Iterate over the query results
+    for (_node, transform, line_position) in query.iter_mut() {
+        // Compare chunkpos and linepos with LinePosition's chunk_idx and line_idx
+        if chunkpos == line_position.chunk_idx && linepos == line_position.line_idx {
+            // Print the UI position (translation) of the matched node
+            println!("UI Position of Line {:?}: {:?}", (chunkpos, linepos), transform.translation());
+        }
+    }
 }
 

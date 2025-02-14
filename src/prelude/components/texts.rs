@@ -19,6 +19,14 @@ pub struct AmISelectedLine{
     selected: bool,
 }
 
+// this one is to tag the entity so that we can match it the line that`s set as a compnent on the
+// Chukers 
+#[derive(Component)]
+pub struct LinePosition{
+    pub chunk_idx: usize,
+    pub line_idx: usize,
+}
+
 #[derive(Component)]
 pub struct ScrollableContent {
    pub max_scroll: f32, // Max scrollable height

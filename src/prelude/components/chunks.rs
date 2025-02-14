@@ -9,6 +9,8 @@ use std::fs;
 pub struct TextChunk {
     pub lines: Vec<String>, 
 }
+
+//maybe unpup the fields and exclusivly use getters.
 #[derive(Resource)]
 pub struct Chunks {
     pub chunks: Vec<TextChunk>,
@@ -57,6 +59,10 @@ impl Chunks {
         self.chunks.get(chunk_idx)?.lines.get(line_idx).map(String::as_str)
     }
 
+    
+    pub fn get_cursor_line_index(&self) -> (usize,usize) {
+        (self.cursor.0,self.cursor.1)
+    }
 
     /// Computes the absolute X position of the cursor in pixels
     pub fn get_cursor_x(&self, char_width: f32) -> f32 {

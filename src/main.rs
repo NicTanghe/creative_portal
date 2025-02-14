@@ -60,9 +60,11 @@ fn main() {
             update_scroll_position,
             text_update_system,
             update_scrollbar_position,
-            cursor_movement_system,
+            cursor_movement_system_v3,
             //scrollbar_drag_system
-            
+           
+            //editor
+            update_selected_line,
 
             //settings
             change_scale_factor,
@@ -99,7 +101,19 @@ fn setup(
     //let cursor_y = cursor_position.1 as f32 * LINE_HEIGHT;
     // Camera
     commands.spawn((Camera2d, IsDefaultUiCamera));
-
+    // Spawn the cursor as a sibling of the root node (not nested inside any other containers)
+    commands.spawn((
+        Node {
+            width: Val::Px(2.0), // Thin vertical line
+            height: Val::Px(LINE_HEIGHT), // Match line height
+            left: Val::Px(chunkers.screenplay.get_cursor_x(FONT_SIZE)), // Position it based on the cursor's X
+            top: Val::Px(0.0), // Adjust top dynamically
+            position_type: PositionType::Absolute, // Absolute positioning relative to the screen
+            ..default()
+        },
+        BackgroundColor(Color::WHITE.into()), // White color for the cursor
+        CursorIndicator, // Custom marker for easy updates
+    ));
     // Root UI node
     commands
         .spawn(Node {
@@ -155,6 +169,10 @@ fn setup(
                                         },
                                         Label,
                                         AccessibilityNode(Accessible::new(Role::ListItem)),
+                                        LinePosition {
+                                            chunk_idx: *chunk_idx,
+                                            line_idx: *line_idx,
+                                        },
                                     ))
                                     .insert(PickingBehavior {
                                         should_block_lower: false,
@@ -162,19 +180,6 @@ fn setup(
                                     });
                                 }
                             }
-                            // **Spawn Cursor**
-                            parent.spawn((
-                                Node {
-                                    width: Val::Px(2.0), // Thin vertical line
-                                    height: Val::Px(LINE_HEIGHT), // Match line height
-                                    left: Val::Px(chunkers.screenplay.get_cursor_x(FONT_SIZE)),
-                                    top: Val::Px(chunkers.screenplay.get_cursor_y(LINE_HEIGHT)),
-                                    position_type: PositionType::Absolute,
-                                    ..default()
-                                },
-                                BackgroundColor(Color::WHITE.into()), // White color for cursor
-                                CursorIndicator, // Custom marker for easy updates
-                            ));
                         });
 
                     // Scrollbar Track
