@@ -65,14 +65,14 @@ fn main() {
             
 
             //settings
-            //change_scale_factor,
+            change_scale_factor,
             ));
 
     app.run();
 }
 
 const FONT_SIZE: f32 = 6.;
-const LINE_HEIGHT: f32 = 14.5;
+const LINE_HEIGHT: f32 = 14.;
 const SCROLLBAR_WIDTH: f32 = 5.0;
 const SCROLL_HANDLE_HEIGHT: f32 = 30.0;
 
@@ -131,7 +131,7 @@ fn setup(
                                 //really fucks with it 2 also how does the scrolfield get larger
                                 //when its smaller/
                                 //why divided by 10 td ? pretty sure a line is not 1 px in size
-                                content_height:line_indices.len() as f32 * LINE_HEIGHT/10.,
+                                content_height:line_indices.len() as f32 * LINE_HEIGHT/12.,
                             },
                             Node {
                                 flex_direction: FlexDirection::Column,

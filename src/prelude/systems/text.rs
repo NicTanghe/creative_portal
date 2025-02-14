@@ -80,6 +80,7 @@ use bevy::ecs::system::ParamSet;
 
 
 
+// note that every button press something is pprinted
 pub fn update_scrollbar_position(
     mut queries: ParamSet<(
         Query<(&ScrollableContainer, &ScrollPosition, &Node)>, // Read-only access
@@ -98,7 +99,7 @@ pub fn update_scrollbar_position(
     // Drop the first borrow before accessing `p1()`
     if let Some(scroll_percent) = scroll_data {
         for mut scrollbar_node in queries.p1().iter_mut() {
-            println!("Updating scrollbar: mapped to {:.2}%", scroll_percent);
+            //println!("Updating scrollbar: mapped to {:.2}%", scroll_percent);
 
             scrollbar_node.top = Val::Percent(scroll_percent);
 
