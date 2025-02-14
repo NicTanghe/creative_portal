@@ -71,7 +71,7 @@ fn main() {
     app.run();
 }
 
-const FONT_SIZE: f32 = 6.;
+const FONT_SIZE: f32 = 12.;
 const LINE_HEIGHT: f32 = 14.;
 const SCROLLBAR_WIDTH: f32 = 5.0;
 const SCROLL_HANDLE_HEIGHT: f32 = 30.0;

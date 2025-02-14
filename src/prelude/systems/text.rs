@@ -37,7 +37,6 @@ pub fn text_update_system(
 }
 
 /// Updates the scroll position of scrollable nodes in response to mouse input
-///
 /// add some formatting that fades in and out cutoff text.
 ///
 pub fn update_scroll_position(
@@ -47,7 +46,7 @@ pub fn update_scroll_position(
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     for mouse_wheel_event in mouse_wheel_events.read() {
-        let (mut dx, mut dy) = match mouse_wheel_event.unit {
+        let (dx, dy) = match mouse_wheel_event.unit {
             MouseScrollUnit::Line => (
                 mouse_wheel_event.x * LINE_HEIGHT,
                 mouse_wheel_event.y * LINE_HEIGHT,
